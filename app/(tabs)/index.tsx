@@ -1,98 +1,142 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useEffect } from 'react'
+import { StyleSheet, Text, View, Pressable } from 'react-native'
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  withDelay,
+  withSpring,
+  Easing,
+  FadeInDown,
+} from 'react-native-reanimated'
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
+
+const EMOJIS = ['🌍', '🧭', '🗺️', '🌋', '🐘']
+
+function FloatingEmoji({ emoji, index }: { emoji: string; index: number }) {
+  const translateY = useSharedValue(0)
+
+  useEffect(() => {
+    translateY.value = withDelay(
+      index * 300,
+      withRepeat(
+        withSequence(
+          withTiming(-12, { duration: 1400, easing: Easing.inOut(Easing.ease) }),
+          withTiming(12, { duration: 1400, easing: Easing.inOut(Easing.ease) })
+        ),
+        -1,
+        true
+      )
+    )
+  }, [index, translateY])
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }))
+
+  return (
+    <Animated.View entering={FadeInDown.delay(600 + index * 150).springify()}>
+      <Animated.Text style={[styles.emoji, animatedStyle]}>{emoji}</Animated.Text>
+    </Animated.View>
+  )
+}
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const buttonScale = useSharedValue(1)
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: buttonScale.value }],
+  }))
+
+  const handlePressIn = () => {
+    buttonScale.value = withSpring(0.92)
+  }
+
+  const handlePressOut = () => {
+    buttonScale.value = withSpring(1)
+  }
+
+  return (
+    <View style={styles.container}>
+      <Animated.Text entering={FadeInDown.duration(600).springify()} style={styles.title}>
+        Globo
+      </Animated.Text>
+
+      <View style={styles.emojiRow}>
+        {EMOJIS.map((emoji, i) => (
+          <FloatingEmoji key={emoji} emoji={emoji} index={i} />
+        ))}
+      </View>
+
+      <Animated.Text
+        entering={FadeInDown.delay(400).duration(600).springify()}
+        style={styles.subtitle}
+      >
+        Pars à la découverte{'\n'}du monde entier !
+      </Animated.Text>
+
+      <AnimatedPressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[styles.button, buttonAnimatedStyle]}
+      >
+        <Text style={styles.buttonText}>Jouer ! 🚀</Text>
+      </AnimatedPressable>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#E8F4FD',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 32,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontFamily: 'Fredoka_600SemiBold',
+    fontSize: 64,
+    color: '#1A73E8',
+    marginBottom: 24,
+    textShadowColor: 'rgba(26, 115, 232, 0.15)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  emojiRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 32,
   },
-});
+  emoji: {
+    fontSize: 40,
+  },
+  subtitle: {
+    fontFamily: 'Nunito_600SemiBold',
+    fontSize: 22,
+    color: '#3A3A3A',
+    textAlign: 'center',
+    lineHeight: 32,
+    marginBottom: 48,
+  },
+  button: {
+    backgroundColor: '#1A73E8',
+    paddingHorizontal: 48,
+    paddingVertical: 18,
+    borderRadius: 28,
+    shadowColor: '#1A73E8',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  buttonText: {
+    fontFamily: 'Fredoka_600SemiBold',
+    fontSize: 26,
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+})
