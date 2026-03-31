@@ -1,3 +1,5 @@
+import '../global.css'
+
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native'
 import { Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold } from '@expo-google-fonts/nunito'
 import { Fredoka_400Regular, Fredoka_600SemiBold } from '@expo-google-fonts/fredoka'

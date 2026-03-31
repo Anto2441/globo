@@ -1,15 +1,15 @@
 import { useEffect } from 'react'
-import { StyleSheet, Text, View, Pressable } from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  withTiming,
-  withDelay,
-  withSpring,
   Easing,
   FadeInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated'
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
@@ -39,7 +39,7 @@ function FloatingEmoji({ emoji, index }: { emoji: string; index: number }) {
 
   return (
     <Animated.View entering={FadeInDown.delay(600 + index * 150).springify()}>
-      <Animated.Text style={[styles.emoji, animatedStyle]}>{emoji}</Animated.Text>
+      <Animated.Text style={[{ fontSize: 40 }, animatedStyle]}>{emoji}</Animated.Text>
     </Animated.View>
   )
 }
@@ -60,12 +60,23 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Animated.Text entering={FadeInDown.duration(600).springify()} style={styles.title}>
+    <View className="flex-1 items-center justify-center bg-brand-50 px-8">
+      <Animated.Text
+        style={{
+          height: 80,
+          fontSize: 64,
+          color: '#1A73E8',
+          fontFamily: 'Fredoka_600SemiBold',
+          textShadowColor: 'rgba(26, 115, 232, 0.15)',
+          textShadowOffset: { width: 0, height: 4 },
+          textShadowRadius: 8,
+          marginBottom: 24,
+        }}
+      >
         Globo
       </Animated.Text>
 
-      <View style={styles.emojiRow}>
+      <View className="mb-8 flex-row gap-4">
         {EMOJIS.map((emoji, i) => (
           <FloatingEmoji key={emoji} emoji={emoji} index={i} />
         ))}
@@ -73,7 +84,8 @@ export default function HomeScreen() {
 
       <Animated.Text
         entering={FadeInDown.delay(400).duration(600).springify()}
-        style={styles.subtitle}
+        className="mb-12 text-center font-nunito-semibold text-xl"
+        style={{ color: '#3A3A3A', lineHeight: 32 }}
       >
         Pars à la découverte{'\n'}du monde entier !
       </Animated.Text>
@@ -81,62 +93,33 @@ export default function HomeScreen() {
       <AnimatedPressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        style={[styles.button, buttonAnimatedStyle]}
+        className="rounded-3xl bg-brand-500 px-12"
+        style={[
+          {
+            paddingVertical: 18,
+            paddingHorizontal: 48,
+            justifyContent: 'center',
+            alignItems: 'center',
+            shadowColor: '#1A73E8',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.35,
+            shadowRadius: 12,
+            elevation: 8,
+          },
+          buttonAnimatedStyle,
+        ]}
       >
-        <Text style={styles.buttonText}>Jouer ! 🚀</Text>
+        <Text
+          style={{
+            fontSize: 26,
+            color: 'white',
+            fontFamily: 'Fredoka_600SemiBold',
+            letterSpacing: 1,
+          }}
+        >
+          Jouer ! 🚀
+        </Text>
       </AnimatedPressable>
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#E8F4FD',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-  },
-  title: {
-    fontFamily: 'Fredoka_600SemiBold',
-    fontSize: 64,
-    color: '#1A73E8',
-    marginBottom: 24,
-    textShadowColor: 'rgba(26, 115, 232, 0.15)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 8,
-  },
-  emojiRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 32,
-  },
-  emoji: {
-    fontSize: 40,
-  },
-  subtitle: {
-    fontFamily: 'Nunito_600SemiBold',
-    fontSize: 22,
-    color: '#3A3A3A',
-    textAlign: 'center',
-    lineHeight: 32,
-    marginBottom: 48,
-  },
-  button: {
-    backgroundColor: '#1A73E8',
-    paddingHorizontal: 48,
-    paddingVertical: 18,
-    borderRadius: 28,
-    shadowColor: '#1A73E8',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  buttonText: {
-    fontFamily: 'Fredoka_600SemiBold',
-    fontSize: 26,
-    color: '#FFFFFF',
-    letterSpacing: 1,
-  },
-})
