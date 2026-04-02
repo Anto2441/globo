@@ -1,3 +1,4 @@
+import { router } from 'expo-router'
 import { useEffect } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import Animated, {
@@ -93,6 +94,7 @@ export default function HomeScreen() {
       <AnimatedPressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        onPress={() => router.push('/continent/europe')}
         className="rounded-3xl bg-brand-500 px-12"
         style={[
           {
