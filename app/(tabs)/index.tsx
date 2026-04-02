@@ -110,12 +110,8 @@ export default function HomeScreen() {
         ]}
       >
         <Text
-          style={{
-            fontSize: 26,
-            color: 'white',
-            fontFamily: 'Fredoka_600SemiBold',
-            letterSpacing: 1,
-          }}
+          className="text-2xl text-white font-fredoka-semibold tracking-wider"
+          style={{ lineHeight: undefined }}
         >
           Jouer ! 🚀
         </Text>
