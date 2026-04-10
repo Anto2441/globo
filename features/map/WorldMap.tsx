@@ -51,42 +51,45 @@ export default function WorldMap() {
   )
 
   return (
-    <View className="flex-1">
-      <Svg width="100%" height="100%" viewBox="0 0 2000 857" preserveAspectRatio="xMidYMid meet">
-        {CONTINENT_KEYS.map((continent) => {
-          const config = CONTINENT_CONFIG[continent]
-          return (
-            <G key={continent} onPress={() => handleTap(continent)}>
-              {continentPaths[continent].map((d, i) => (
-                <Path key={i} d={d} fill={config.color} stroke="#ffffff" strokeWidth={0.5} />
-              ))}
-            </G>
-          )
-        })}
-      </Svg>
+    <View className="flex-1 w-full items-center justify-center">
+      {/* Aspect-ratio wrapper ensures the SVG fills full width with correct height */}
+      <View className="w-full relative" style={{ aspectRatio: 2000 / 857 }}>
+        <Svg width="100%" height="100%" viewBox="0 0 2000 857" preserveAspectRatio="xMidYMid meet">
+          {CONTINENT_KEYS.map((continent) => {
+            const config = CONTINENT_CONFIG[continent]
+            return (
+              <G key={continent} onPress={() => handleTap(continent)}>
+                {continentPaths[continent].map((d, i) => (
+                  <Path key={i} d={d} fill={config.color} stroke="#ffffff" strokeWidth={0.5} />
+                ))}
+              </G>
+            )
+          })}
+        </Svg>
 
-      {/* Animated label overlay */}
-      {activeContinent && (
-        <Animated.View
-          style={[
-            {
-              position: 'absolute',
-              left: `${(CONTINENT_CONFIG[activeContinent].anchor.x / 2000) * 100}%`,
-              top: `${(CONTINENT_CONFIG[activeContinent].anchor.y / 857) * 100}%`,
-            },
-            labelStyle,
-          ]}
-          className="rounded-2xl bg-white/90 px-4 py-2 shadow-md"
-          pointerEvents="none"
-        >
-          <Animated.Text
-            className="font-fredoka-semibold text-2xl"
-            style={{ color: CONTINENT_CONFIG[activeContinent].color, lineHeight: undefined }}
+        {/* Animated label overlay — positioned relative to the SVG container */}
+        {activeContinent && (
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                left: `${(CONTINENT_CONFIG[activeContinent].anchor.x / 2000) * 100}%`,
+                top: `${(CONTINENT_CONFIG[activeContinent].anchor.y / 857) * 100}%`,
+              },
+              labelStyle,
+            ]}
+            className="rounded-2xl bg-white/90 px-4 py-2 shadow-md"
+            pointerEvents="none"
           >
-            {CONTINENT_CONFIG[activeContinent].label}
-          </Animated.Text>
-        </Animated.View>
-      )}
+            <Animated.Text
+              className="font-fredoka-semibold text-2xl"
+              style={{ color: CONTINENT_CONFIG[activeContinent].color, lineHeight: undefined }}
+            >
+              {CONTINENT_CONFIG[activeContinent].label}
+            </Animated.Text>
+          </Animated.View>
+        )}
+      </View>
     </View>
   )
 }
