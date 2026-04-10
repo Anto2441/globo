@@ -2,9 +2,12 @@ import { CONTINENT_CONFIG } from '@/constants/continentConfig'
 import { COUNTRY_CONTINENTS, type ContinentKey } from '@/constants/countryContinents'
 import { WORLD_PATHS } from '@/constants/worldPaths'
 import { useCallback, useRef, useState } from 'react'
-import { View } from 'react-native'
+import { View, useWindowDimensions } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import Svg, { G, Path } from 'react-native-svg'
+
+const VIEWBOX_WIDTH = 2000
+const VIEWBOX_HEIGHT = 857
 
 // Group paths by continent at module level (computed once)
 const continentPaths = Object.keys(CONTINENT_CONFIG).reduce<Record<ContinentKey, string[]>>(
@@ -26,6 +29,7 @@ const CONTINENT_KEYS = Object.keys(CONTINENT_CONFIG) as ContinentKey[]
 
 export default function WorldMap() {
   const [activeContinent, setActiveContinent] = useState<ContinentKey | null>(null)
+  const { width: screenWidth } = useWindowDimensions()
   const opacity = useSharedValue(0)
   const scale = useSharedValue(0.8)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -50,11 +54,18 @@ export default function WorldMap() {
     [opacity, scale]
   )
 
+  const svgHeight = screenWidth > 0 ? (screenWidth / VIEWBOX_WIDTH) * VIEWBOX_HEIGHT : 0
+
   return (
     <View className="flex-1 w-full items-center justify-center">
-      {/* Aspect-ratio wrapper ensures the SVG fills full width with correct height */}
-      <View className="w-full relative" style={{ aspectRatio: 2000 / 857 }}>
-        <Svg width="100%" height="100%" viewBox="0 0 2000 857" preserveAspectRatio="xMidYMid meet">
+      {/* SVG fills screen width and scales height proportionally */}
+      <View className="w-full relative">
+        <Svg
+          width={screenWidth}
+          height={svgHeight}
+          viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
           {CONTINENT_KEYS.map((continent) => {
             const config = CONTINENT_CONFIG[continent]
             return (
